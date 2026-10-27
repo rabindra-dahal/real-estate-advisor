@@ -15,11 +15,8 @@ def run_simulation():
     # 1. Initialize Adapters & Use Cases
     sqlite_repo = SQLiteRepository()
     chroma_repo = ChromaRepository()
-    gemini_api = GeminiService()
-    ollama_local = OllamaService()
 
     ingest_use_case = IngestPropertyUseCase(sqlite_repo, chroma_repo)
-    query_use_case = QueryAdvisorUseCase(sqlite_repo, chroma_repo, gemini_api, ollama_local)
 
     # 2. Mock Dataset (Structured & Unstructured Property Listings)
     sample_properties = [
@@ -68,39 +65,12 @@ def run_simulation():
         except ValueError as e:
             print(f"  Skipping {prop['doc_id']}: {str(e)}")
 
-    # 4. Simulate User RAG Query Interactions
-    sample_queries = [
-        "Find me a luxury high-end property in Manhattan with skyline views and a private elevator.",
-        "What properties do you have under one million dollars suitable for a family near good schools?",
-        "Are there any industrial lofts available with exposed brick features?",
-        "I need a commercial facility with high bay clearance and loading docks."
-    ]
-
-    print("\n Phase 2: Simulating Intelligent Advisor Query Engagements...")
-    
-    # We will simulate temporary network isolation by intentionally breaking Gemini 
-    # for a single run to demonstrate the clean fallback pattern.
-    original_key = os.getenv("GEMINI_API_KEY")
-
-    for i, user_q in enumerate(sample_queries):
-        print(f"\n User Query: '{user_q}'")
-        
-        # Inject artificial anomaly on the 3rd query to force local Ollama backup processing
-        if i == 2:
-            print("[SIMULATION CONFIG] Simulating API Outage: Dropping Gemini Key temporarily...")
-            os.environ["GEMINI_API_KEY"] = ""
-        elif original_key:
-            os.environ["GEMINI_API_KEY"] = original_key
-
-        start_time = time.time()
-        response = query_use_case.execute(user_q)
-        duration = time.time() - start_time
-
-        print(f"  Execution Engine Used: {response['engine'].upper()}")
-        print(f"  Knowledge Sources Correlated: {response['sources']} references found")
-        print(f"  Response Latency Profile: {duration:.2f}s")
-        print(f"  Advisor Response Snippet:\n   \"{response['advice'][:160]}...\"")
-
+    # sample_queries = [
+    #     "Find me a luxury high-end property in Manhattan with skyline views and a private elevator.",
+    #     "What properties do you have under one million dollars suitable for a family near good schools?",
+    #     "Are there any industrial lofts available with exposed brick features?",
+    #     "I need a commercial facility with high bay clearance and loading docks."
+    # ]
     print("\n Simulation completed successfully! Check your SQLite `clean_real_estate.db` file to review persisted system audit records.")
 
 if __name__ == "__main__":
