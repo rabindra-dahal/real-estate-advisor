@@ -100,3 +100,29 @@ class SQLiteRepository(IRelationalRepository):
             )
             session.add(db_error)
             session.commit()
+
+    def get_recent_errors(self, limit: int = 10) -> List[ErrorLog]:
+        """Fetches recent error log records sorted chronologically descending."""
+        with self.SessionLocal() as session:
+            db_errors = session.query(DBErrorLog)\
+                               .order_by(DBErrorLog.timestamp.desc())\
+                               .limit(limit)\
+                               .all()
+            return [
+                ErrorLog(e.id, e.endpoint, e.method, e.error_message, e.stack_trace, e.timestamp)
+                for e in db_errors
+            ]
+
+    def get_error_by_id(self, log_id: str) -> Optional[ErrorLog]:
+        """Retrieves a single error log signature by its distinct tracking code."""
+        with self.SessionLocal() as session:
+            e = session.query(DBErrorLog).filter(DBErrorLog.id == log_id).first()
+            if not e: return None
+            return ErrorLog(e.id, e.endpoint, e.method, e.error_message, e.stack_trace, e.timestamp)
+
+    def clear_all_error_logs(self) -> int:
+        with self.SessionLocal() as session:
+            deleted_count = session.query(DBErrorLog).delete(synchronize_session=False)
+            session.commit()
+            return deleted_count
+
