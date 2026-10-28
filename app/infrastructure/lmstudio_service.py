@@ -10,14 +10,21 @@ class LMStudioService(ILLMService):
         self.base_url = base_url
         self.chat_endpoint = f"{self.base_url}/chat/completions"
         self.models_endpoint = f"{self.base_url}/models"
+        # Reusable connection pool client for all async requests
+        self.client = httpx.AsyncClient()
 
-    def _get_active_model_name(self) -> str:
+    async def close(self):
+        """Closes the underlying HTTP client connection pool safely."""
+        await self.client.close()
+
+    async def _get_active_model_name(self) -> str:
         """
         Fetches the runtime model listing from LM Studio dynamically.
         Falls back to a default label string if no active runtime model is found.
         """
         try:
-            response = httpx.get(self.models_endpoint, timeout=5.0)
+            # Replaced httpx.get with self.client.get and awaited it
+            response = await self.client.get(self.models_endpoint, timeout=5.0)
             response.raise_for_status()
             models_data = response.json()
             
@@ -33,9 +40,9 @@ class LMStudioService(ILLMService):
         # System baseline fallback tag string if the dashboard array is unpopulated
         return "local-model"
 
-    def generate(self, prompt: str) -> str:
-        # Dynamically discover what you have running right now in the app window
-        active_model = self.get_active_model_name()
+    async def generate(self, prompt: str) -> str:
+        # Fixed typo: changed get_active_model_name to self._get_active_model_name and added await
+        active_model = await self._get_active_model_name()
 
         payload = {
             "model": active_model,
@@ -47,7 +54,8 @@ class LMStudioService(ILLMService):
         }
 
         try:
-            response = httpx.post(self.chat_endpoint, json=payload, timeout=45.0)
+            # Replaced httpx.post with self.client.post and awaited it
+            response = await self.client.post(self.chat_endpoint, json=payload, timeout=45.0)
             response.raise_for_status()
             
             data = response.json()

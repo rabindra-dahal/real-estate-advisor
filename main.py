@@ -2,6 +2,7 @@ import os
 import uuid
 import traceback
 from fastapi import FastAPI, Request
+from contextlib import asynccontextmanager
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
@@ -20,7 +21,14 @@ from app.delivery.api_v3 import router
 
 load_dotenv()
 
-app = FastAPI(title="Clean Architecture Architecture Real Estate RAG")
+# Set up clean async lifespan management context controls
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Initialize db tables asynchronously on application starting phases
+    await sqlite_repo.init_db()
+    yield
+
+app = FastAPI(title="Async High-Performance Advisor Engine", lifespan=lifespan)
 
 # --- Configure CORS Security Layer ---
 # Define explicit origin access lists. Avoid using ["*"] in production settings.
