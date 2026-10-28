@@ -25,3 +25,12 @@ class AdviceLog:
         self.answer = answer
         self.provider_used = provider_used
         self.timestamp = timestamp or datetime.utcnow()
+
+class ErrorLog:
+    def __init__(self, log_id: str, endpoint: str, method: str, error_message: str, stack_trace: str, timestamp: Optional[datetime] = None):
+        self.log_id = log_id
+        self.endpoint = endpoint
+        self.method = method
+        self.error_message = error_message
+        self.stack_trace = stack_trace
+        self.timestamp = timestamp or datetime.utcnow()

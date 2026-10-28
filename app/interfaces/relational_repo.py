@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import List, Optional
-from app.domain.entities import Property, AdviceLog, ChatMessage
+from app.domain.entities import Property, AdviceLog, ChatMessage, ErrorLog
 
 class IRelationalRepository(ABC):
     @abstractmethod
@@ -20,4 +20,10 @@ class IRelationalRepository(ABC):
 
     @abstractmethod
     def delete_session_history(self, session_id: str) -> int: pass
+
+    @abstractmethod
+    def save_error_log(self, error_entity: ErrorLog) -> None:
+        """Persists the diagnostic error tracking log to storage."""
+        pass
+
 

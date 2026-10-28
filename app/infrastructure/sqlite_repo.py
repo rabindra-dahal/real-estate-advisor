@@ -3,7 +3,7 @@ from sqlalchemy.orm import declarative_base, sessionmaker
 from typing import List, Optional
 import datetime
 from app.interfaces.relational_repo import IRelationalRepository
-from app.domain.entities import Property, AdviceLog, ChatMessage
+from app.domain.entities import ErrorLog, Property, AdviceLog, ChatMessage
 
 Base = declarative_base()
 
@@ -30,6 +30,15 @@ class DBChatMessage(Base):
     session_id = Column(String, index=True, nullable=False)
     role = Column(String, nullable=False)
     content = Column(Text, nullable=False)
+    timestamp = Column(DateTime, default=datetime.datetime.utcnow)
+
+class DBErrorLog(Base):
+    __tablename__ = "error_logs"
+    id = Column(String, primary_key=True)
+    endpoint = Column(String, nullable=False)
+    method = Column(String, nullable=False)
+    error_message = Column(Text, nullable=False)
+    stack_trace = Column(Text, nullable=False)
     timestamp = Column(DateTime, default=datetime.datetime.utcnow)
 
 class SQLiteRepository(IRelationalRepository):
@@ -78,3 +87,16 @@ class SQLiteRepository(IRelationalRepository):
                                    .delete(synchronize_session=False)
             session.commit()
             return deleted_count
+    
+    def save_error_log(self, error: ErrorLog):
+        with self.SessionLocal() as session:
+            db_error = DBErrorLog(
+                id=error.log_id,
+                endpoint=error.endpoint,
+                method=error.method,
+                error_message=error.error_message,
+                stack_trace=error.stack_trace,
+                timestamp=error.timestamp
+            )
+            session.add(db_error)
+            session.commit()
