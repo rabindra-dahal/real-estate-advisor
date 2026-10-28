@@ -17,3 +17,7 @@ class IRelationalRepository(ABC):
 
     @abstractmethod
     def get_session_history(self, session_id: str, limit: int = 10) -> List[ChatMessage]: pass
+
+    @abstractmethod
+    def delete_session_history(self, session_id: str) -> int: pass
+

@@ -70,3 +70,11 @@ class SQLiteRepository(IRelationalRepository):
                                  .suffix_with(f"LIMIT {limit}")\
                                  .all()
             return [ChatMessage(m.id, m.session_id, m.role, m.content, m.timestamp) for m in db_messages]
+
+    def delete_session_history(self, session_id: str) -> int:
+        with self.SessionLocal() as session:
+            deleted_count = session.query(DBChatMessage)\
+                                   .filter(DBChatMessage.session_id == session_id)\
+                                   .delete(synchronize_session=False)
+            session.commit()
+            return deleted_count
