@@ -7,39 +7,6 @@ An enterprise-grade Real Estate Advisory engine engineered using **Python**, **F
 
 The application isolates core business domains from framework layers, drivers, and external API toolkits. 
 
-                  ┌───────────────────────────────┐
-                  │      Delivery / API Layer     │
-                  │        (FastAPI DTOs)         │
-                  └───────────────┬───────────────┘
-                                  │
-                                  ▼
-                  ┌───────────────────────────────┐
-                  │        Use Case Layer         │
-                  │   (Ingestion & Query Logic)   │
-                  └───────────────┬───────────────┘
-                                  │
-            ┌─────────────────────┴─────────────────────┐
-            ▼                                           ▼
-┌───────────────────────┐                   ┌───────────────────────┐
-│  Relational Interface │                   │   Vector Interface    │
-├───────────────────────┤                   ├───────────────────────┤
-│   SQLite Repository   │                   │   ChromaDB Adapter    │
-│ (Properties & Logs)   │                   │  (Sentence Embeddings)│
-└───────────────────────┘                   └───────────┬───────────┘
-                                                        │ (Enriched Context)
-                                                        ▼
-                                            ┌───────────────────────┐
-                                            │ LLM Service Interface │
-                                            ├───────────────────────┤
-                                            │ Gemini 3.5 Flash Lite │
-                                            └───────────┬───────────┘
-                                                        │ (Fallback)
-                                                        ▼
-                                            ┌───────────────────────┐
-                                            │      Ollama Host      │
-                                            └───────────────────────┘
-
-
 ---
 
 ### Core Architecture Layers
