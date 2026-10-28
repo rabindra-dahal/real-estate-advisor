@@ -1,7 +1,9 @@
 from sqlalchemy import create_engine, Column, String, Float, Text, DateTime
 from sqlalchemy.orm import declarative_base, sessionmaker
+from typing import List, Optional
+import datetime
 from app.interfaces.relational_repo import IRelationalRepository
-from app.domain.entities import Property, AdviceLog
+from app.domain.entities import Property, AdviceLog, ChatMessage
 
 Base = declarative_base()
 
@@ -21,6 +23,14 @@ class DBAdviceLog(Base):
     answer = Column(Text)
     provider_used = Column(String)
     timestamp = Column(DateTime)
+
+class DBChatMessage(Base):
+    __tablename__ = "chat_messages"
+    id = Column(String, primary_key=True)
+    session_id = Column(String, index=True, nullable=False)
+    role = Column(String, nullable=False)
+    content = Column(Text, nullable=False)
+    timestamp = Column(DateTime, default=datetime.datetime.utcnow)
 
 class SQLiteRepository(IRelationalRepository):
     def __init__(self, db_url: str = "sqlite:///./clean_real_estate.db"):
@@ -45,3 +55,18 @@ class SQLiteRepository(IRelationalRepository):
             db_log = DBAdviceLog(id=log.log_id, question=log.question, answer=log.answer, provider_used=log.provider_used, timestamp=log.timestamp)
             session.add(db_log)
             session.commit()
+
+    def save_message(self, message: ChatMessage):
+        with self.SessionLocal() as session:
+            db_msg = DBChatMessage(id=message.message_id, session_id=message.session_id, role=message.role, content=message.content, timestamp=message.timestamp)
+            session.add(db_msg)
+            session.commit()
+
+    def get_session_history(self, session_id: str, limit: int = 10) -> List[ChatMessage]:
+        with self.SessionLocal() as session:
+            db_messages = session.query(DBChatMessage)\
+                                 .filter(DBChatMessage.session_id == session_id)\
+                                 .order_by(DBChatMessage.timestamp.asc())\
+                                 .suffix_with(f"LIMIT {limit}")\
+                                 .all()
+            return [ChatMessage(m.id, m.session_id, m.role, m.content, m.timestamp) for m in db_messages]

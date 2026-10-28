@@ -16,4 +16,15 @@ class ChromaRepository(IVectorRepository):
     def similarity_search(self, query_text: str, limit: int) -> List[str]:
         embedding = self.embed_model.encode(query_text).tolist()
         results = self.collection.query(query_embeddings=[embedding], n_results=limit)
-        return results.get("documents", [[]])[0]
+        
+        formatted_results = []
+        documents = results.get("documents", [[]])[0]
+        metadatas = results.get("metadatas", [[]])[0]
+        
+        for doc, meta in zip(documents, metadatas):
+            # Combine the raw vector text block with the metadata attributes
+            enriched_text = f"Price: ${meta.get('price')} | Location: {meta.get('location')} | Details: {doc}"
+            formatted_results.append(enriched_text)
+            
+        return formatted_results
+

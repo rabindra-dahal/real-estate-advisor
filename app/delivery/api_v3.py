@@ -15,4 +15,4 @@ def add_property(payload: PropertyRequestDTO, request: Request):
 @router.post("/advise")
 def get_advice(payload: QueryRequestDTO, request: Request):
     use_case = request.app.state.query_advisor_use_case
-    return use_case.execute(payload.question)
+    return use_case.execute(payload.question, payload.session_id)

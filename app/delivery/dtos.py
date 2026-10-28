@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from typing import Optional
 
 class PropertyRequestDTO(BaseModel):
     doc_id: str
@@ -9,3 +10,4 @@ class PropertyRequestDTO(BaseModel):
 
 class QueryRequestDTO(BaseModel):
     question: str
+    session_id: str  # Mandatory key parameter ensuring target execution path clarity
