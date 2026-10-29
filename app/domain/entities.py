@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 
 class ChatMessage:
@@ -7,7 +7,7 @@ class ChatMessage:
         self.session_id = session_id  # Ties multiple messages into a single thread
         self.role = role              # 'user', 'model', or 'system'
         self.content = content
-        self.timestamp = timestamp or datetime.utcnow()
+        self.timestamp = timestamp or datetime.now(timezone.utc)
 
 class Property:
     def __init__(self, doc_id: str, text: str, price: float, location: str, property_type: str, created_at: Optional[datetime] = None):
@@ -16,7 +16,7 @@ class Property:
         self.price = price
         self.location = location
         self.property_type = property_type
-        self.created_at = created_at or datetime.utcnow()
+        self.created_at = created_at or datetime.now(timezone.utc)
 
 class AdviceLog:
     def __init__(self, log_id: str, question: str, answer: str, provider_used: str, timestamp: Optional[datetime] = None):
@@ -24,7 +24,7 @@ class AdviceLog:
         self.question = question
         self.answer = answer
         self.provider_used = provider_used
-        self.timestamp = timestamp or datetime.utcnow()
+        self.timestamp = timestamp or datetime.now(timezone.utc)
 
 class ErrorLog:
     def __init__(self, log_id: str, endpoint: str, method: str, error_message: str, stack_trace: str, timestamp: Optional[datetime] = None):
@@ -33,4 +33,4 @@ class ErrorLog:
         self.method = method
         self.error_message = error_message
         self.stack_trace = stack_trace
-        self.timestamp = timestamp or datetime.utcnow()
+        self.timestamp = timestamp or datetime.now(timezone.utc)
