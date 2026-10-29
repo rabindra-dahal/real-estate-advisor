@@ -1,5 +1,5 @@
-from pydantic import BaseModel
-from typing import Optional, List
+from pydantic import BaseModel, ConfigDict
+from typing import Optional, List, Union
 from datetime import datetime
 
 class PropertyRequestDTO(BaseModel):
@@ -17,11 +17,9 @@ class ChatMessageResponseDTO(BaseModel):
     message_id: str
     role: str
     content: str
-    timestamp: datetime
+    timestamp: Union[datetime, str]
 
-    class Config:
-        # Instructs Pydantic to read standard object property fields cleanly
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 class ChatHistoryResponseDTO(BaseModel):
     session_id: str
