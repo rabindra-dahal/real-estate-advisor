@@ -1,6 +1,6 @@
 # 🏡 Resilient Real Estate Advisor (RAG + Clean Architecture)
 
-An enterprise-grade Real Estate Advisory engine engineered using **Python**, **FastAPI**, and **Clean Architecture (Domain-Driven Design)** concepts. The platform combines semantic vector lookups with structural persistence layers, employing **Google Gemini** as the primary reasoning model and an automated offline fallback to a local **Ollama (Llama 3.1)** service.
+An enterprise-grade Real Estate Advisory engine engineered using **Python**, **FastAPI**, and **Clean Architecture (Domain-Driven Design)** concepts. The platform combines semantic vector lookups with structural persistence layers, employing **Google Gemini** as the primary reasoning model and an automated offline fallback to a local **Ollama (Llama 3.1)** service and local LMStudio.
 
 ---
 ### 🏗️ System Architecture
@@ -63,6 +63,7 @@ python-dotenv
 sqlalchemy
 google-genai
 ollama
+httpx
 ```
 
 Install the requirements:
